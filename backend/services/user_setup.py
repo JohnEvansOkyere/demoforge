@@ -7,16 +7,23 @@ logger = logging.getLogger(__name__)
 
 
 def ensure_user_rows(user_id: str, email: str = None):
-    """Create credits and profile rows for a user if they don't exist."""
+    """Create credits and profile rows for a user if they don't exist.
+    
+    Also grants 1 free credit to users who have 0 credits and 0 demos
+    (handles rows created during broken signups).
+    """
     supabase = get_supabase()
 
-    # Credits row (1 free demo for new users)
-    existing = supabase.table("user_credits").select("user_id").eq("user_id", user_id).execute()
+    existing = supabase.table("user_credits").select("user_id, credits").eq("user_id", user_id).execute()
     if not existing.data:
         supabase.table("user_credits").insert({"user_id": user_id, "credits": 1}).execute()
         logger.info("Created credits row for user %s", user_id)
+    elif existing.data[0]["credits"] == 0:
+        demos = supabase.table("demos").select("id", count="exact").eq("user_id", user_id).execute()
+        if demos.count == 0:
+            supabase.table("user_credits").update({"credits": 1}).eq("user_id", user_id).execute()
+            logger.info("Restored free credit for user %s (no demos generated)", user_id)
 
-    # Profile row — fetch email from Supabase if not provided
     if not email:
         try:
             user_resp = supabase.auth.admin.get_user_by_id(user_id)
