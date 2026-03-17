@@ -176,7 +176,7 @@ function Generate({ session, sessionLoading }) {
               disabled={paying}
               className="inline-flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-3.5 py-2 text-xs font-semibold text-amber-400 transition-colors hover:bg-amber-500/20 disabled:opacity-50"
             >
-              {paying ? 'Redirecting...' : '+ Buy 1 credit — GHS 50'}
+              {paying ? 'Redirecting...' : '+ Buy 3 credits — GHS 50'}
             </button>
           </div>
         )}
@@ -191,14 +191,14 @@ function Generate({ session, sessionLoading }) {
             </div>
             <h2 className="font-display text-2xl font-bold tracking-tight">You've used your free demo</h2>
             <p className="mx-auto mt-3 max-w-md text-sm text-neutral-400 leading-relaxed">
-              Each demo costs <span className="font-semibold text-amber-400">GHS 50</span>. Pay easily with Mobile Money (MTN MoMo, Vodafone Cash, AirtelTigo) or card.
+              Get <span className="font-semibold text-amber-400">3 demos for GHS 50</span>. Pay easily with Mobile Money (MTN MoMo, Vodafone Cash, AirtelTigo) or card.
             </p>
             <button
               onClick={handleBuyCredits}
               disabled={paying}
               className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-8 py-3.5 text-sm font-semibold text-black transition-all hover:from-amber-400 hover:to-orange-400 disabled:opacity-50"
             >
-              {paying ? 'Redirecting to payment...' : 'Buy 1 demo credit — GHS 50'}
+              {paying ? 'Redirecting to payment...' : 'Buy 3 demo credits — GHS 50'}
             </button>
             <p className="mt-4 text-xs text-neutral-600">Powered by Paystack. Secure payment.</p>
             {error && <p className="mt-3 text-sm text-red-400">{error}</p>}

@@ -19,7 +19,7 @@ router = APIRouter(prefix="/payments", tags=["payments"])
 PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY", "")
 PAYSTACK_BASE = "https://api.paystack.co"
 PRICE_PESEWAS = 5000  # GHS 50 = 5000 pesewas
-CREDITS_PER_PURCHASE = 1
+CREDITS_PER_PURCHASE = 3
 
 
 class InitPaymentRequest(BaseModel):
