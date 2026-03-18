@@ -21,7 +21,21 @@ function DemoCard({ demo }) {
       onClick={() => navigate(`/demo/${demo.id}`)}
       className="group flex flex-col overflow-hidden rounded-2xl border border-[#171717] bg-[#0a0a0a] text-left transition-all hover:border-[#262626] hover:shadow-lg"
     >
-      <div className={`h-32 w-full bg-gradient-to-br ${gradient}`} />
+      {/* Live preview thumbnail */}
+      <div className={`relative h-48 w-full overflow-hidden bg-gradient-to-br ${gradient}`}>
+        {demo.demo_html && (
+          <iframe
+            title={demo.idea}
+            srcDoc={demo.demo_html}
+            sandbox="allow-scripts"
+            className="pointer-events-none absolute left-0 top-0 h-[900px] w-[1440px] origin-top-left"
+            style={{ transform: 'scale(0.24)', transformOrigin: 'top left' }}
+            tabIndex={-1}
+            loading="lazy"
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent opacity-60" />
+      </div>
       <div className="flex flex-1 flex-col gap-2 p-4">
         <p className="line-clamp-2 text-sm text-neutral-300 group-hover:text-white">{demo.idea}</p>
         <div className="mt-auto flex items-center justify-between pt-2 text-xs text-neutral-600">
