@@ -1,4 +1,5 @@
 """On-demand user setup: creates credits and profile rows if missing."""
+import asyncio
 import logging
 
 from services.supabase_client import get_supabase
@@ -6,12 +7,8 @@ from services.supabase_client import get_supabase
 logger = logging.getLogger(__name__)
 
 
-def ensure_user_rows(user_id: str, email: str = None):
-    """Create credits and profile rows for a user if they don't exist.
-    
-    Also grants 1 free credit to users who have 0 credits and 0 demos
-    (handles rows created during broken signups).
-    """
+def _ensure_user_rows_sync(user_id: str, email: str = None):
+    """Sync version — runs in thread pool."""
     supabase = get_supabase()
 
     existing = supabase.table("user_credits").select("user_id, credits").eq("user_id", user_id).execute()
@@ -37,3 +34,8 @@ def ensure_user_rows(user_id: str, email: str = None):
         if not existing_profile.data:
             supabase.table("profiles").insert({"id": user_id, "email": email}).execute()
             logger.info("Created profile for user %s (%s)", user_id, email)
+
+
+async def ensure_user_rows(user_id: str, email: str = None):
+    """Non-blocking wrapper for user setup."""
+    await asyncio.to_thread(_ensure_user_rows_sync, user_id, email)

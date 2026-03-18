@@ -56,7 +56,7 @@ async def get_credits(
     if not user_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Auth required")
 
-    ensure_user_rows(user_id, user_email)
+    await ensure_user_rows(user_id, user_email)
 
     supabase = get_supabase()
     res = supabase.table("user_credits").select("credits").eq("user_id", user_id).single().execute()
@@ -163,7 +163,7 @@ async def paystack_webhook(request: Request):
     user_id = payment["user_id"]
     credits_to_add = payment["credits_purchased"]
 
-    ensure_user_rows(user_id)
+    await ensure_user_rows(user_id)
     credit_res = supabase.table("user_credits").select("credits").eq("user_id", user_id).single().execute()
     current = credit_res.data["credits"] if credit_res.data else 0
 
@@ -208,7 +208,7 @@ async def verify_payment(reference: str, user_id: str = Depends(get_user_id)):
 
     supabase.table("payments").update({"status": "success"}).eq("paystack_reference", reference).execute()
 
-    ensure_user_rows(user_id)
+    await ensure_user_rows(user_id)
     credit_res = supabase.table("user_credits").select("credits").eq("user_id", user_id).single().execute()
     current = credit_res.data["credits"] if credit_res.data else 0
     new_credits = current + payment["credits_purchased"]

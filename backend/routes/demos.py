@@ -62,7 +62,7 @@ async def generate_demo_route(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Sign in to generate demos")
 
     supabase = get_supabase()
-    ensure_user_rows(user_id, user_email)
+    await ensure_user_rows(user_id, user_email)
 
     # Atomic deduction: prevents race condition from concurrent requests
     deduct_result = supabase.rpc("deduct_credit", {"uid": user_id}).execute()

@@ -1,7 +1,8 @@
 """Auth middleware that verifies tokens via Supabase's own API.
 
-No JWT secret needed — delegates verification to Supabase directly.
+Uses asyncio.to_thread to avoid blocking the event loop.
 """
+import asyncio
 import os
 from typing import Optional
 
@@ -21,21 +22,24 @@ def _get_auth_client():
     return _auth_client
 
 
+def _verify_token_sync(token: str):
+    """Sync Supabase call — will be run in a thread."""
+    client = _get_auth_client()
+    result = client.auth.get_user(token)
+    if result and result.user:
+        return {"sub": str(result.user.id), "email": result.user.email}
+    return None
+
+
 async def auth_middleware(request: Request, call_next):
-    """Verify token via Supabase and attach user info to request.state."""
+    """Verify token via Supabase without blocking the event loop."""
     auth_header: Optional[str] = request.headers.get("Authorization")
     user = None
 
     if auth_header and auth_header.startswith("Bearer "):
         token = auth_header.split(" ", 1)[1]
         try:
-            client = _get_auth_client()
-            result = client.auth.get_user(token)
-            if result and result.user:
-                user = {
-                    "sub": str(result.user.id),
-                    "email": result.user.email,
-                }
+            user = await asyncio.to_thread(_verify_token_sync, token)
         except Exception:
             user = None
 
